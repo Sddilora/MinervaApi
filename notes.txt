@@ -1,0 +1,351 @@
+SDK: Software Development Kit
+Initialize the Firebase SDK in your Go application:
+
+import (
+    "context"
+    "firebase.google.com/go"
+    "google.golang.org/api/option"
+)
+
+ctx := context.Background()
+config := &firebase.Config{
+    DatabaseURL: "https://<your-database-name>.firebaseio.com",
+}
+
+opt := option.WithCredentialsFile("<path/to/serviceAccountKey.json>")
+
+app, err := firebase.NewApp(ctx, config, opt)
+if err != nil {
+    // handle error
+}
+
+client, err := app.Database(ctx)
+if err != nil {
+    // handle error
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+Use GORM to define models that match the structure of your Firebase Realtime Database.
+For example, if you have a "users" node with the fields "name" and "email", you can define a User model like this:
+
+type User struct {
+    ID    uint   `json:"id" gorm:"primary_key"`
+    Name  string `json:"name"`
+    Email string `json:"email"`
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+Use GORM to create database tables from your model definitions:
+
+db, err := gorm.Open(mysql.Open("<your-database-connection-string>"), &gorm.Config{})
+if err != nil {
+    // handle error
+}
+
+err = db.AutoMigrate(&User{})
+if err != nil {
+    // handle error
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+Use Gofiber to define API endpoints that interact with your Firebase Realtime Database using the Firebase SDK and GORM.
+For example, to get all the users from the "users" node:
+
+app := fiber.New()
+
+app.Get("/users", func(c *fiber.Ctx) error {
+    var users []User
+
+    ref := client.NewRef("users")
+    snapshot, err := ref.Get(ctx)
+    if err != nil {
+        // handle error
+    }
+
+    err = snapshot.ForEach(func(childSnapshot *firestore.DocumentSnapshot) error {
+        var user User
+
+        err := childSnapshot.DataTo(&user)
+        if err != nil {
+            // handle error
+        }
+
+        users = append(users, user)
+
+        return nil
+    })
+    if err != nil {
+        // handle error
+    }
+
+    return c.JSON(users)
+})
+
+app.Listen(":3000")
+
+
+type User struct {
+	ID    string `firestore:"id,omitempty"`
+	Name  string `firestore:"name,omitempty"`
+	Email string `firestore:"email,omitempty"`
+}
+
+const (
+	usersCollection = "users"
+)
+
+func userRef(client *firestore.Client, id string) *firestore.DocumentRef {
+	return client.Collection(usersCollection).Doc(id)
+}
+
+ctx := context.Background()
+	creds := option.WithCredentialsFile("path/to/your/credentials.json")
+	client, err := firestore.NewClient(ctx, "your-project-id", creds)
+
+	if err != nil {
+		log.Fatalf("Failed to create Firestore client: %v", err)
+	}
+	defer client.Close()
+
+	db, err := gorm.Open(firestore.New(client), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Failed to create GORM Firestore connection: %v", err)
+	}
+
+	app := fiber.New()
+
+	app.Post("/users", func(c *fiber.Ctx) error {
+		user := new(User)
+		if err := c.BodyParser(user); err != nil {
+			return err
+		}
+		result := db.Create(user)
+		if result.Error != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Failed to create user",
+			})
+		}
+		return c.Status(fiber.StatusCreated).JSON(user)
+	})
+
+	return app
+
+////////////////////////////////////////////////////////////////////////////////
+
+    func main() {
+   ctx := context.Background()
+   opt := option.WithCredentialsFile("../../service_account.json")
+   client, err := firestore.NewClient(ctx, "tiebing-test1", opt)
+   if err != nil {
+        log.Fatalf("firestore new error:%s\n", err)
+   }
+   defer client.Close()
+
+   //create
+   if false {
+        wr, err := client.Doc("States/Colorado").Create(ctx, map[string]interface{}{
+                "capital": "Denver",
+                "pop":     5.5,
+        })
+        if err != nil {
+                log.Fatalf("firestore Doc Create error:%s\n", err)
+        }
+        fmt.Println(wr.UpdateTime)
+   }
+
+   //update
+   if true {
+        if _, err := client.Doc("States/Colorado").
+                Update(context.Background(), []firestore.Update{{"FlagColor", nil, "Red"}, {Path: "Location", Value: "Middle"}}); err != nil {
+                log.Fatalf("Update error: %s\n", err)
+        }
+   }
+
+   //read
+   state, err := client.Doc("States/Colorado").Get(context.Background())
+   json, err := json.MarshalIndent(state.Data(), "", "  ")
+   fmt.Println(string(json))
+   
+    //event, specific collection
+    col := client.Collection("States")
+    iter := col.Snapshots(context.Background())
+    defer iter.Stop()
+
+    for {
+        //Next() call blocks, until changes are received
+        doc, err := iter.Next()
+        if err != nil {
+            if err == iterator.Done {
+                break
+            }
+            //return err
+            log.Printf("next iter error %s\n", err)
+        }
+
+        for _, change := range doc.Changes {
+            // access the change.Doc returns the Document,
+            // which contains Data() and DataTo(&p) methods.
+            switch change.Kind {
+            case firestore.DocumentAdded:
+                log.Printf("doc added, %s\n", change.Doc.Ref.Path)
+                // on added it returns the existing ones.
+                isNew := change.Doc.CreateTime.After(l.startTime)
+            case firestore.DocumentModified:
+                log.Printf("doc modified, %s\n", change.Doc.Ref.Path)
+            case firestore.DocumentRemoved:
+                log.Printf("doc removed, %s\n", change.Doc.Ref.Path)
+            }
+        }
+
+    }
+
+
+}
+
+///////////////////////////////////////////////////////////////////
+
+// app := Minerva()
+	//To start working with this package, create a client with a project ID
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, "minerva-95196")
+	if err != nil {
+		fmt.Println(err)
+		//Handle error.
+	}
+
+	//This client is built around references to collections and documents.
+	ny := client.Doc("Topics/QrcBXCcwVmn91zT55AUX")
+
+	//Use DocumentRef.Get to read a document.
+	x := firestore.DocumentRef{Path: "projects/P/databases/D/documents/Topics/QrcBXCcwVmn91zT55AUX"}
+
+	fmt.Println(x)
+	fmt.Println(ny)
+	// //The result is a DocumentSnapshot. Call its Data method to obtain the entire document contents as a map.
+	// docsnap, err := ny.Get(ctx)
+	// if err != nil {
+	// 	//: Handle error.
+	// }
+	// dataMap := docsnap.Data()
+	// fmt.Println(dataMap)
+
+	// app := fiber.New()
+
+	// app.Listen(":6020")
+
+/////////////////////////////Bişiolursadursun////////////
+
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"log"
+	"os"
+
+	"cloud.google.com/go/firestore"
+	"github.com/gofiber/fiber/v2"
+	"google.golang.org/api/option"
+)
+
+func main() {
+
+	setup := Setup()
+	log.Fatal(setup.Listen(":7334"))
+
+	jsonData := Key()
+
+	// Create a new Firestore client using the Google Application Credentials path
+	ctx := context.Background()
+	app, err := firestore.NewClient(ctx, "minerva-95196", option.WithCredentialsJSON(jsonData))
+	if err != nil {
+		log.Fatalf("Failed to create Firestore client: %v", err)
+	}
+	defer app.Close()
+
+	// Firestore client
+
+}
+
+func Key() []byte {
+
+	// Load the service account key file
+	keyFile, err := os.Open("key.json")
+	if err != nil {
+		log.Fatalf("Failed to open service account key file: %v", err)
+	}
+	defer keyFile.Close()
+
+	// Parse the service account key JSON data
+	var keyData map[string]interface{}
+	if err := json.NewDecoder(keyFile).Decode(&keyData); err != nil {
+		log.Fatalf("Failed to parse service account key file: %v", err)
+	}
+
+	// Convert keyData to JSON format
+	jsonData, err := json.Marshal(keyData)
+	if err != nil {
+		log.Fatalf("Failed to marshal credentials: %v", err)
+	}
+	return jsonData
+}
+
+func Setup() *fiber.App {
+
+	app := fiber.New()
+
+	//We will add login part later
+	// app.Post("/login", func(c *fiber.Ctx) error {
+
+	// })
+
+	app.Post("/users", func(c *fiber.Ctx) error {
+		// Parse request body
+		var newUser struct {
+			Name     string `json:"name"`
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}
+		if err := c.BodyParser(&newUser); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "Invalid request body",
+			})
+		}
+
+		// Create new user
+		user := map[string]interface{}{
+			"name":     newUser.Name,
+			"email":    newUser.Email,
+			"password": newUser.Password,
+		}
+
+		// Add user to Firestore
+		_, err := userCol.Doc(newUser.Email).Set(ctx, user)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Failed to add user to Firestore",
+			})
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"message": "User created successfully",
+		})
+	})
+
+
+	app.Post("/topic", func(c *fiber.Ctx) error {
+
+	})
+
+	app.Post("/topic/research", func(c *fiber.Ctx) error {
+
+	})
+
+	return app
+
+}
+
+
