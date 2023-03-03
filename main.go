@@ -13,7 +13,7 @@ import (
 
 var (
 	ctx     context.Context
-	app     *firestore.Client
+	appfire *firestore.Client
 	userCol *firestore.CollectionRef
 )
 
@@ -24,14 +24,14 @@ func main() {
 	// Create a new Firestore client using the Google Application Credentials path
 	ctx = context.Background()
 	var err error
-	app, err = firestore.NewClient(ctx, "minerva-95196", option.WithCredentialsJSON(jsonData))
+	appfire, err = firestore.NewClient(ctx, "minerva-95196", option.WithCredentialsJSON(jsonData))
 	if err != nil {
 		log.Fatalf("Failed to create Firestore client: %v", err)
 	}
-	defer app.Close()
+	defer appfire.Close()
 
 	// Firestore client
-	userCol = app.Collection("users")
+	userCol = appfire.Collection("users")
 
 	setup := Setup()
 	log.Fatal(setup.Listen(":7334"))
@@ -71,6 +71,8 @@ func Setup() *fiber.App {
 
 	app.Post("/users", func(c *fiber.Ctx) error {
 
+		userCol = appfire.Collection("Users")
+
 		// Parse request body
 		var newUser struct {
 			Name     string `json:"name"`
@@ -101,6 +103,84 @@ func Setup() *fiber.App {
 
 		resp := fiber.Map{
 			"message": "User created successfully",
+		}
+		return c.Status(fiber.StatusCreated).JSON(resp)
+	})
+
+	///////////////////////////////TOPIC//////////////////////////////////////////////
+
+	app.Post("/topic", func(c *fiber.Ctx) error {
+
+		userCol = appfire.Collection("Topic")
+
+		// Parse request body
+		var newTopic struct {
+			Topic string `json:"topic"`
+		}
+
+		if err := c.BodyParser(&newTopic); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "Invalid request body",
+			})
+		}
+
+		// Create new Topic
+		topic := map[string]interface{}{
+			"topic": newTopic.Topic,
+		}
+
+		// Add Topic to Firestore
+		_, err := userCol.Doc(newTopic.Topic).Set(ctx, topic)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Failed to add Topic to Firestore",
+			})
+		}
+
+		resp := fiber.Map{
+			"message": "Topic created successfully",
+		}
+		return c.Status(fiber.StatusCreated).JSON(resp)
+	})
+
+	//////////////////////////////RESEARCH//////////////////////////////////////////////////
+
+	app.Post("/topic/research", func(c *fiber.Ctx) error {
+
+		userCol = appfire.Collection("Research")
+
+		// Parse request body
+		var newResearch struct {
+			ResearchHeader      string `json:"research_header"`
+			ResearchContent     string `json:"research_content"`
+			ResearchCreator     string `json:"research_creator"`
+			ResearchContributor string `json:"research_contributor`
+		}
+
+		if err := c.BodyParser(&newResearch); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "Invalid request body",
+			})
+		}
+
+		// Create new user
+		research := map[string]interface{}{
+			"research_header":      newResearch.ResearchHeader,
+			"research_content":     newResearch.ResearchContent,
+			"research_creator":     newResearch.ResearchCreator,
+			"research_contributor": newResearch.ResearchCreator,
+		}
+
+		// Add user to Firestore
+		_, err := userCol.Doc(newResearch.ResearchHeader).Set(ctx, research)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Failed to add Research to Firestore",
+			})
+		}
+
+		resp := fiber.Map{
+			"message": "Research created successfully",
 		}
 		return c.Status(fiber.StatusCreated).JSON(resp)
 	})
