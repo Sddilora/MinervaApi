@@ -154,7 +154,7 @@ func Setup() *fiber.App {
 			ResearchHeader      string `json:"research_header"`
 			ResearchContent     string `json:"research_content"`
 			ResearchCreator     string `json:"research_creator"`
-			ResearchContributor string `json:"research_contributor`
+			ResearchContributor string `json:"research_contributor"`
 		}
 
 		if err := c.BodyParser(&newResearch); err != nil {
