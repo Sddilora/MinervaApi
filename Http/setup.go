@@ -2,6 +2,8 @@ package setup
 
 import (
 	key "api/Http/Key"
+	"fmt"
+
 	"context"
 	"log"
 	"time"
@@ -27,7 +29,6 @@ func Setup() (*fiber.App, *firestore.Client) {
 	jsonData := key.Key()
 
 	ctx = context.Background() // Create a new Firestore client using the Google Application Credentials path
-
 	opt := option.WithGRPCDialOption(grpc.WithKeepaliveParams(keepalive.ClientParameters{
 		Time: 2 * time.Minute,
 	}))
@@ -36,11 +37,6 @@ func Setup() (*fiber.App, *firestore.Client) {
 	if err != nil {
 		log.Fatalf("Failed to create Firestore client: %v", err)
 	}
-
-	//We will add login part later
-	// app.Post("/login", func(c *fiber.Ctx) error {
-
-	// })
 
 	app.Post("/user", func(c *fiber.Ctx) error {
 
@@ -64,7 +60,7 @@ func Setup() (*fiber.App, *firestore.Client) {
 			"password": newUser.Password,
 		}
 
-		_, err := userCol.Doc(newUser.Name).Set(ctx, user) // Add user to Firestore
+		_, err := userCol.Doc(newUser.Email).Set(ctx, user) // Add user to Firestore
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": "Failed to add user to Firestore",
@@ -75,6 +71,47 @@ func Setup() (*fiber.App, *firestore.Client) {
 			"message": "User created successfully",
 		}
 		return c.Status(fiber.StatusCreated).JSON(resp)
+	})
+
+	///////////////////////////////////       LOGİN        //////////////////////////////////////////////
+
+	app.Post("/login", func(c *fiber.Ctx) error {
+
+		var login struct { // Parse request body
+			Name     string `json:"name"`
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}
+
+		if err := c.BodyParser(&login); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": "Invalid request body",
+			})
+		}
+
+		documentPath := fmt.Sprint("Users/", login.Email)
+
+		x, err := appfire.Doc(documentPath).Get(ctx)
+
+		emailCr := x.Data()
+
+		if err != nil {
+			return err
+		}
+
+		incomePassword := login.Password
+		truePassword := emailCr["password"]
+
+		if incomePassword == truePassword {
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{
+				"message": "Acces permitted",
+			})
+		} else {
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{
+				"message": "Acces denied",
+			})
+		}
+
 	})
 
 	///////////////////////////////TOPIC//////////////////////////////////////////////
@@ -151,8 +188,4 @@ func Setup() (*fiber.App, *firestore.Client) {
 	})
 
 	return app, appfire
-}
-
-func Users() {
-
 }

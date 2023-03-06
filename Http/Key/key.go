@@ -9,7 +9,7 @@ import (
 func Key() []byte {
 
 	// Load the service account key file
-	keyFile, err := os.Open("Key/key.json")
+	keyFile, err := os.Open("C:/Users/sumey/Desktop/software/Back-End/Minerva/Http/Key/key.json")
 	if err != nil {
 		log.Fatalf("Failed to open service account key file: %v", err)
 	}
