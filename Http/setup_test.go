@@ -41,6 +41,33 @@ func TestEndpoints(t *testing.T) {
 		t.Errorf("Expected response body '%s' but got '%s'", expected, string(body))
 	}
 
+	//////////////////////////////////////////////   LOGİN    //////////////////////////////////////////////
+
+	req = httptest.NewRequest("POST", "/login", bytes.NewBuffer([]byte(`{
+		"name": "Dilara",
+		"email": "sumeyyedilaradogan@gmail.com",
+		"password": "7331"
+	}`)))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err = app.Test(req, -1) // Perform the request
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.StatusCode != http.StatusOK { // Check the response status code
+		t.Errorf("Expected status code %d but got %d", http.StatusOK, resp.StatusCode)
+	}
+
+	expected = `{"message":"Acces permitted"}` // Check the response body
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(body) != expected {
+		t.Errorf("Expected response body '%s' but got '%s'", expected, string(body))
+	}
+
 	//////////////////////////////////////////////   TOPİC    //////////////////////////////////////////////
 
 	req = httptest.NewRequest("POST", "/topic", bytes.NewBuffer([]byte(`{
