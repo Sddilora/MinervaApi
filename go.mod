@@ -5,11 +5,6 @@ go 1.19
 require github.com/gofiber/fiber/v2 v2.42.0
 
 require (
-	github.com/gofiber/utils v0.0.10 // indirect
-	github.com/gorilla/schema v1.1.0 // indirect
-)
-
-require (
 	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
