@@ -26,10 +26,10 @@ func run() error {
 	appfire, _, _, _ := create.NewFireStore()
 	defer appfire.Close()
 
-	// Add middleware
-	app.Use(logger.New())
-	app.Use(recoverMw.New())
-	app.Use(cors.New())
+	//Middlewares
+	app.Use(logger.New())    //records the details of incoming requests when any HTTP request is made. This can be used for purposes such as debugging and performance optimization.
+	app.Use(recoverMw.New()) //catches any errors that may cause the program to crash or interrupt and keep the server running.
+	app.Use(cors.New())      //It helps applications bypass CORS restrictions by providing appropriate responses that allow or deny HTTP requests access to their resources.
 
 	requests.PostUser(app, appfire)
 	requests.PostTopic(app, appfire)
