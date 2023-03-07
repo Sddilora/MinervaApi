@@ -1,7 +1,7 @@
 notes.txt
 key.json
-#I dont know why.
-#  Here is why :
+
+#My project's gitignore wasn't working before, here is why and the solution :
 
 # The files/folder in your version control will not just delete themselves just because you added them to the .gitignore.
 # They are already in the repository and you have to remove them. You can just do that with this:
