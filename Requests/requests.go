@@ -1,46 +1,18 @@
-package setup
+package requests
 
 import (
-	key "api/Http/Key"
-	"fmt"
-
-	"context"
+	create "api/Create"
 	"log"
-	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/gofiber/fiber/v2"
-	"google.golang.org/api/option"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/keepalive"
 )
 
-func Setup() (*fiber.App, *firestore.Client) {
+var _, userCol, ctx, _ = create.NewFireStore()
 
-	app := fiber.New()
+func PostUser(App *fiber.App, appfire *firestore.Client) {
 
-	var (
-		ctx     context.Context
-		appfire *firestore.Client
-		userCol *firestore.CollectionRef
-		err     error
-	)
-
-	jsonData := key.Key()
-
-	ctx = context.Background() // Create a new Firestore client using the Google Application Credentials path
-	opt := option.WithGRPCDialOption(grpc.WithKeepaliveParams(keepalive.ClientParameters{
-		Time: 2 * time.Minute,
-	}))
-
-	appfire, err = firestore.NewClient(ctx, "minerva-95196", option.WithCredentialsJSON(jsonData), opt)
-	if err != nil {
-		log.Fatalf("Failed to create Firestore client: %v", err)
-	}
-
-	app.Post("/user", func(c *fiber.Ctx) error {
-
-		userCol = appfire.Collection("Users")
+	App.Post("/user", func(c *fiber.Ctx) error {
 
 		var newUser struct { // Parse request body
 			Name     string `json:"name"`
@@ -60,6 +32,8 @@ func Setup() (*fiber.App, *firestore.Client) {
 			"password": newUser.Password,
 		}
 
+		userCol = appfire.Collection("Users")
+
 		_, err := userCol.Doc(newUser.Email).Set(ctx, user) // Add user to Firestore
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -73,50 +47,10 @@ func Setup() (*fiber.App, *firestore.Client) {
 		return c.Status(fiber.StatusCreated).JSON(resp)
 	})
 
-	///////////////////////////////////       LOGİN        //////////////////////////////////////////////
+}
 
-	app.Post("/login", func(c *fiber.Ctx) error {
-
-		var login struct { // Parse request body
-			Name     string `json:"name"`
-			Email    string `json:"email"`
-			Password string `json:"password"`
-		}
-
-		if err := c.BodyParser(&login); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"message": "Invalid request body",
-			})
-		}
-
-		documentPath := fmt.Sprint("Users/", login.Email)
-
-		x, err := appfire.Doc(documentPath).Get(ctx)
-
-		emailCr := x.Data()
-
-		if err != nil {
-			return err
-		}
-
-		incomePassword := login.Password
-		truePassword := emailCr["password"]
-
-		if incomePassword == truePassword {
-			return c.Status(fiber.StatusOK).JSON(fiber.Map{
-				"message": "Acces permitted",
-			})
-		} else {
-			return c.Status(fiber.StatusOK).JSON(fiber.Map{
-				"message": "Acces denied",
-			})
-		}
-
-	})
-
-	///////////////////////////////TOPIC//////////////////////////////////////////////
-
-	app.Post("/topic", func(c *fiber.Ctx) error {
+func PostTopic(App *fiber.App, appfire *firestore.Client) {
+	App.Post("/topic", func(c *fiber.Ctx) error {
 
 		userCol = appfire.Collection("Topic")
 
@@ -147,10 +81,10 @@ func Setup() (*fiber.App, *firestore.Client) {
 		}
 		return c.Status(fiber.StatusCreated).JSON(resp)
 	})
+}
 
-	//////////////////////////////RESEARCH//////////////////////////////////////////////////
-
-	app.Post("/topic/research", func(c *fiber.Ctx) error {
+func Research(App *fiber.App, appfire *firestore.Client) {
+	App.Post("/topic/research", func(c *fiber.Ctx) error {
 
 		userCol = appfire.Collection("Research")
 
@@ -186,6 +120,4 @@ func Setup() (*fiber.App, *firestore.Client) {
 		}
 		return c.Status(fiber.StatusCreated).JSON(resp)
 	})
-
-	return app, appfire
 }
