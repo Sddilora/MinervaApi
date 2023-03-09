@@ -5,6 +5,18 @@ go 1.19
 require github.com/gofiber/fiber/v2 v2.42.0
 
 require (
+	cloud.google.com/go/iam v0.12.0 // indirect
+	cloud.google.com/go/storage v1.28.1 // indirect
+	firebase.google.com/go v3.13.0+incompatible // indirect
+	firebase.google.com/go/v4 v4.10.0 // indirect
+	github.com/MicahParks/keyfunc v1.5.1 // indirect
+	github.com/ScafTeam/firebase-go-client v0.0.2 // indirect
+	github.com/firebase/firebase-admin-go v3.13.0+incompatible // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
+	google.golang.org/appengine/v2 v2.0.2 // indirect
+)
+
+require (
 	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
@@ -23,6 +35,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/sacsand/gofiber-firebaseauth v1.4.3
 	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect
 	github.com/tinylib/msgp v1.1.6 // indirect
