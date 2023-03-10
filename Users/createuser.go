@@ -13,14 +13,14 @@ import (
 func CreateUserHandler(c *fiber.Ctx) error {
 
 	_, appfire := create.NewFireStore()
-
+	// Parse request body
 	var newUser struct {
 		Name     string `json:"name"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 		PhotoUrl string `json:"photo_url"`
 	}
-
+	//Error Handler
 	if err := c.BodyParser(&newUser); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid request body",
@@ -35,11 +35,12 @@ func CreateUserHandler(c *fiber.Ctx) error {
 		PhotoURL(newUser.PhotoUrl).
 		Disabled(false) //Whether the user has been disabled. true for disabled; false for active . If not provided, the default value is false.
 
-	client, err := appfire.Auth(context.Background()) //Returns auth.Client for CreateUser func
+	//Returns auth.Client for CreateUser func
+	client, err := appfire.Auth(context.Background())
 	if err != nil {
 		log.Printf("error creating user: %v\n", err)
 	}
-
+	//Creates a new user with the specified properties and returns an userRecord
 	userRecord, err := client.CreateUser(context.Background(), params)
 	if err != nil {
 		log.Printf("error creating user: %v\n", err)
