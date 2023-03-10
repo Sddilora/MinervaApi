@@ -21,16 +21,15 @@ func main() {
 	app.Use(recoverMw.New()) //catches any errors that may cause the program to crash or interrupt and keep the server running.
 	app.Use(cors.New())      //It helps applications bypass CORS restrictions by providing appropriate responses that allow or deny HTTP requests access to their resources.
 
-	//_, _, fireApp := create.NewFireStore()
-
+	//Post Routes
 	app.Post("/signup", auth.CreateUserHandler)
 	app.Post("/signin", auth.SigninHandler)
-
-	// Authenticaed Routes.
 	app.Post("/topic", requests.PostTopicHandler)
 	app.Post("/topic/research", requests.PostResearchHandler)
-	// app.Get("/topics" /*,func will be added */)           // Ignore the auth by IgnoreUrls config
-	// app.Get("/topic/researches" /*,func will be added */) // Ignore the auth by IgnoreUrls config
+
+	//Get Routes(We will add them later)
+	// app.Get("/topics" /*,func will be added */)
+	// app.Get("/topic/researches" /*,func will be added */)
 
 	log.Fatal(app.Listen(":7334"))
 }
