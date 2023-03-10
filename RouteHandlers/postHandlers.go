@@ -1,21 +1,20 @@
 package requests
 
 import (
-	create "api/Create"
+	create "api/FireBase"
 	"context"
 	"log"
 
-	"cloud.google.com/go/firestore"
 	"github.com/gofiber/fiber/v2"
 )
 
-var _, userCol, _ = create.NewFireStore()
+var _, firebaseApp = create.NewFireStore()
 
-var appfire *firestore.Client
+var fireStoreClient, err = firebaseApp.Firestore(context.Background())
 
-func PostTopic(c *fiber.Ctx) error {
+func PostTopicHandler(c *fiber.Ctx) error {
 
-	userCol = appfire.Collection("Topic")
+	userCol := fireStoreClient.Collection("Topic")
 
 	var newTopic struct { // Parse request body
 		Topic string `json:"topic"`
@@ -31,7 +30,7 @@ func PostTopic(c *fiber.Ctx) error {
 		"topic": newTopic.Topic,
 	}
 
-	_, err := userCol.Doc(newTopic.Topic).Set(context.Background(), topic) // Add Topic to Firestore
+	_, err := userCol.Doc(newTopic.Topic).Set(context.Background(), &topic) // Add Topic to Firestore
 	if err != nil {
 		log.Printf("Failed to add Topic to Firestore: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -45,9 +44,9 @@ func PostTopic(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(resp)
 }
 
-func Research(c *fiber.Ctx) error {
+func PostResearchHandler(c *fiber.Ctx) error {
 
-	userCol = appfire.Collection("Research")
+	userCol := fireStoreClient.Collection("Research")
 
 	var newResearch struct { // Parse request body
 		ResearchHeader      string `json:"research_header"`
@@ -62,14 +61,14 @@ func Research(c *fiber.Ctx) error {
 		})
 	}
 
-	research := map[string]interface{}{ // Create new user
+	research := map[string]interface{}{ // Create new research
 		"research_header":      newResearch.ResearchHeader,
 		"research_content":     newResearch.ResearchContent,
 		"research_creator":     newResearch.ResearchCreator,
 		"research_contributor": newResearch.ResearchContributor,
 	}
 
-	_, err := userCol.Doc(newResearch.ResearchHeader).Set(context.Background(), research) // Add user to Firestore
+	_, err := userCol.Doc(newResearch.ResearchHeader).Set(context.Background(), &research) // Add user to Firestore
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Failed to add Research to Firestore",

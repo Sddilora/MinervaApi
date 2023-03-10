@@ -4,17 +4,16 @@ import (
 	"context"
 	"log"
 
-	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"google.golang.org/api/option"
 )
 
-func NewFireStore() (*auth.Client, *firestore.CollectionRef, *firebase.App) {
+func NewFireStore() (*auth.Client, *firebase.App) {
 
-	var UserCol *firestore.CollectionRef
+	//var UserCol *firestore.CollectionRef
 
-	opt := option.WithCredentialsFile("C:/Users/sumey/Desktop/software/Back-End/Minerva/Create/key.json")
+	opt := option.WithCredentialsFile("C:/Users/sumey/Desktop/software/Back-End/Minerva/FireBase/key.json")
 	appFire, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		log.Fatalf("Failed while creating firebaseApp: %v", err)
@@ -26,5 +25,12 @@ func NewFireStore() (*auth.Client, *firestore.CollectionRef, *firebase.App) {
 		log.Fatalf("Something went wrong while creating client: %v", err)
 	}
 
-	return client, UserCol, appFire
+	// fireStoreClient, err := appFire.Firestore(context.Background())
+	// if err != nil {
+	// 	log.Fatalf("Failed while creating firebaseClient: %v", err)
+	// }
+
+	//UserCol = fireStoreClient.Collection("Collection")
+
+	return client, appFire
 }

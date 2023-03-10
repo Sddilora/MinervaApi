@@ -1,17 +1,21 @@
 package auth
 
 import (
-	create "api/Create"
-	"context"
+	//auth "github.com/ScafTeam/firebase-go-client/auth"
+
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
-	//"github.com/ScafTeam/firebase-go-client/auth"
 )
 
 func SigninHandler(c *fiber.Ctx) error {
 
-	_, _, appfire := create.NewFireStore()
+	//_, _, appfire := create.NewFireStore()
 
 	var UserSignin struct {
 		Email    string `json:"email"`
@@ -24,37 +28,89 @@ func SigninHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	client, err := appfire.Auth(context.Background())
-	if err != nil {
-		log.Printf("error while signin : %v\n", err)
-	}
-
-	u, err := client.GetUserByEmail(context.Background(), UserSignin.Email)
-	if err != nil {
-		log.Printf("error getting user by email: %s: %v\n", UserSignin.Email, err)
-	}
-
-	// k, err := client.CustomToken(context.Background(), u.UID)
-	// if err != nil {
-	// 	log.Printf("error getting custom token: %s: %v\n", UserSignin.Email, err)
-	// }
-
-	// z, err := client.SAMLProviderConfig()(context.Background(), u.ProviderID)
-	// if err != nil {
-	// 	log.Printf("error getting OpenID Connect: %s: %v\n", UserSignin.Email, err)
-	// }
-
-	err = client.Sign(ctx, email, password)
-	if err != nil {
-		log.Fatalf("error verifying password: %v\n", err)
-	}
-	log.Printf("Successfully fetched user data: %v\n", z, u.UID, u.ProviderID)
+	k := authenticationHandler(UserSignin.Email, UserSignin.Password)
+	log.Print("bakalım", k)
 
 	resp := fiber.Map{
 		"message": "Login access permitted ",
 	}
 	return c.Status(fiber.StatusCreated).JSON(resp)
+
 }
+
+func authenticationHandler(email string, password string) map[string]interface{} {
+	// Create Http request
+	apiKey, err := os.ReadFile("Users/apikey.txt")
+	if err != nil {
+		panic(err)
+	}
+	url := fmt.Sprintf("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=%s", string(apiKey))
+	requestData := map[string]string{
+		"email":             email,
+		"password":          password,
+		"returnSecureToken": "true",
+	}
+	requestBody, err := json.Marshal(requestData)
+	if err != nil {
+		panic(err)
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// HTTP isteğini gönder ve yanıtı işle
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	// Yanıtı oku
+	var responseBody map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&responseBody)
+	if err != nil {
+		panic(err)
+	}
+
+	return responseBody
+}
+
+// client, err := appfire.Auth(context.Background())
+// if err != nil {
+// 	log.Printf("error while signin : %v\n", err)
+// }
+
+// user := &auth.UserToImport{
+// 	params: UserSignin.Email,
+// }
+
+//	user.PasswordHash([]byte(UserSignin.Password))
+
+//u, err := client.GetUserByEmail(context.Background(), UserSignin.Email)
+//client.ImportUsers([]*auth.UserToImport{user})
+// u, err := client.GetUserByEmail(context.Background(), UserSignin.Email)
+// if err != nil {
+// 	log.Printf("error getting user by email: %s: %v\n", UserSignin.Email, err)
+// }
+
+// k, err := client.CustomToken(context.Background(), u.UID)
+// if err != nil {
+// 	log.Printf("error getting custom token: %s: %v\n", UserSignin.Email, err)
+// }
+
+// z, err := client.SAMLProviderConfig()(context.Background(), u.ProviderID)
+// if err != nil {
+// 	log.Printf("error getting OpenID Connect: %s: %v\n", UserSignin.Email, err)
+// }
+
+// err = client.Sign(ctx, email, password)
+// if err != nil {
+// 	log.Fatalf("error verifying password: %v\n", err)
+// }
+// log.Printf("Successfully fetched user data: %v\n", z, u.UID, u.ProviderID)
 
 // func loginHandler(w http.ResponseWriter, r *http.Request) {
 

@@ -1,7 +1,7 @@
 package auth
 
 import (
-	create "api/Create"
+	create "api/FireBase"
 	"context"
 	"log"
 
@@ -12,7 +12,7 @@ import (
 // When a POST request is sent to the /user endpoint, get the JSON object and save it to Firebase Authentication:
 func CreateUserHandler(c *fiber.Ctx) error {
 
-	_, _, appfire := create.NewFireStore()
+	_, appfire := create.NewFireStore()
 
 	var newUser struct {
 		Name     string `json:"name"`
@@ -34,22 +34,26 @@ func CreateUserHandler(c *fiber.Ctx) error {
 		DisplayName(newUser.Name).
 		PhotoURL(newUser.PhotoUrl).
 		Disabled(false) //Whether the user has been disabled. true for disabled; false for active . If not provided, the default value is false.
-	client, err := appfire.Auth(context.Background())
+
+	client, err := appfire.Auth(context.Background()) //Returns auth.Client for CreateUser func
 	if err != nil {
 		log.Printf("error creating user: %v\n", err)
 	}
-	u, err := client.CreateUser(context.Background(), params)
+
+	userRecord, err := client.CreateUser(context.Background(), params)
 	if err != nil {
 		log.Printf("error creating user: %v\n", err)
+		c.SendString("error creating user")
 	} else {
-		log.Printf("Successfully created user: %v\n", u)
+		log.Printf("Successfully created user: %v\n", userRecord.DisplayName)
+		c.SendString("User Created Succesfully")
 	}
 
-	resp := fiber.Map{
-		"message": "User created successfully",
-	}
-	return c.Status(fiber.StatusCreated).JSON(resp)
-
+	// resp := fiber.Map{
+	// 	"message": "User created successfully",
+	// }
+	// return c.Status(fiber.StatusCreated).JSON(resp)
+	return nil
 }
 
 /* user update seçeneği ekleyeceğimiz zaman kullanacağız:
