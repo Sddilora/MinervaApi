@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -24,13 +23,20 @@ func SigninHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	k := authenticationHandler(UserSignin.Email, UserSignin.Password)
-	log.Print("bakalım", k)
+	confirmation := authenticationHandler(UserSignin.Email, UserSignin.Password)
 
-	resp := fiber.Map{
-		"message": "Login access permitted ",
+	_, ok := confirmation["registered"].(bool)
+	if ok {
+		resp := fiber.Map{
+			"message": "Login access permitted ",
+		}
+		return c.Status(fiber.StatusUnauthorized).JSON(resp)
+	} else {
+		resp := fiber.Map{
+			"message": "Login access denied ",
+		}
+		return c.Status(fiber.StatusOK).JSON(resp)
 	}
-	return c.Status(fiber.StatusCreated).JSON(resp)
 
 }
 
