@@ -41,20 +41,19 @@ func CreateUserHandler(c *fiber.Ctx) error {
 		log.Printf("error creating user: %v\n", err)
 	}
 	//Creates a new user with the specified properties and returns an userRecord
-	userRecord, err := client.CreateUser(context.Background(), params)
+	_, err = client.CreateUser(context.Background(), params)
 	if err != nil {
-		log.Printf("error creating user: %v\n", err)
-		c.SendString("error creating user")
+		log.Print(err)
+		resp := fiber.Map{
+			"message": "user could not be created ",
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(resp)
 	} else {
-		log.Printf("Successfully created user: %v\n", userRecord.DisplayName)
-		c.SendString("User Created Succesfully")
+		resp := fiber.Map{
+			"message": "User Created Succesfully",
+		}
+		return c.Status(fiber.StatusOK).JSON(resp)
 	}
-
-	// resp := fiber.Map{
-	// 	"message": "User created successfully",
-	// }
-	// return c.Status(fiber.StatusCreated).JSON(resp)
-	return nil
 }
 
 /* user update seçeneği ekleyeceğimiz zaman kullanacağız:
