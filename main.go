@@ -1,37 +1,24 @@
 package main
 
 import (
-	requests "api/RouteHandlers"
-
-	auth "api/Users"
 	"log"
 
+	middlewares "api/Middlewares"
+	methods "api/RequestMethods"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	recoverMw "github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
-
+	//Creates new fiber app
 	app := fiber.New()
 
-	//Middlewares
-	app.Use(logger.New())    //records the details of incoming requests when any HTTP request is made. This can be used for purposes such as debugging and performance optimization.
-	app.Use(recoverMw.New()) //catches any errors that may cause the program to crash or interrupt and keep the server running.
-	app.Use(cors.New())      //It helps applications bypass CORS restrictions by providing appropriate responses that allow or deny HTTP requests access to their resources.
+	//Uses middlewares
+	middlewares.FiberMiddlewares(app)
 
-	//Auth Routes
-	app.Post("/signup", auth.CreateUserHandler)
-	app.Post("/signin", auth.SigninHandler)
+	//Calls allowed post methods
+	methods.PostMethods(app)
 
-	//Save data to Database Routes
-	app.Post("/topic", requests.PostTopicHandler)
-	app.Post("/topic/research", requests.PostResearchHandler)
-
-	//Retrieve data from Database Routes
-	app.Post("/topics", requests.PostTopicsHandler)
-	app.Post("/topic/researches", requests.PostResearchesHandler)
-
+	//Starts the HTTP server
 	log.Fatal(app.Listen(":7334"))
 }
