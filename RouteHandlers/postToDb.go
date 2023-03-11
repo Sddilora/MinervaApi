@@ -16,26 +16,31 @@ var (
 
 // PostTopicHandler handles the request and gives the proper response
 func PostTopicHandler(c *fiber.Ctx) error {
-	// Creates a reference to a collection to Topic path.
-	userCol := fireStoreClient.Collection("Topic")
 
 	// Parse request body
 	var newTopic struct {
 		Topic string `json:"topic"`
 	}
-	//Error Handler
+	//Body parser, Error Handler
 	if err := c.BodyParser(&newTopic); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid request body",
 		})
 	}
+
+	// Creates a reference to a collection to Topic path.
+	userCol := fireStoreClient.Collection("Topic")
+	//Creates unıq id for document
+	docRefUID := userCol.NewDoc()
+
 	// Create new Topic
 	topic := map[string]interface{}{
-		"topic": newTopic.Topic,
+		"topic":    newTopic.Topic,
+		"topic_id": docRefUID.ID,
 	}
 
 	// Add Topic to Firestore
-	_, err := userCol.NewDoc().Set(context.Background(), &topic)
+	_, err := docRefUID.Set(context.Background(), &topic)
 	if err != nil {
 		log.Printf("Failed to add Topic to Firestore: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
