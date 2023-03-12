@@ -19,6 +19,6 @@ func PostMethods(app *fiber.App) {
 
 	//Retrieve data from Database Routes
 	app.Post("/topics", requests.PostTopicsHandler)
-	//app.Post("/topic/researches", requests.PostResearchesHandler)
+	app.Post("/topic/researches", requests.PostResearchesHandler)
 
 }
