@@ -73,7 +73,7 @@ func PostResearchHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	// Creates a reference to a collection to Research path.
+	// Creates a reference to a collection group to Research path.
 	colPath := fmt.Sprintf("Topic/%s/%s", newResearch.ResearchTopicId, newResearch.ResearchHeader)
 	userCol := fireStoreClient.Collection(colPath)
 
@@ -84,6 +84,7 @@ func PostResearchHandler(c *fiber.Ctx) error {
 		"research_creator":     newResearch.ResearchCreator,
 		"research_contributor": newResearch.ResearchContributor,
 	}
+
 	// Add Research to Firestore
 	_, err := userCol.Doc(newResearch.ResearchHeader).Set(context.Background(), &research)
 	if err != nil {
