@@ -19,6 +19,12 @@ func main() {
 	//Calls allowed post methods
 	methods.PostMethods(app)
 
+	//Calls allowed put methods
+	methods.PutMethods(app)
+
+	//Calls allowed delete methods
+	methods.DeleteMethods(app)
+
 	//Starts the HTTP server
 	log.Fatal(app.Listen(":7334"))
 }
