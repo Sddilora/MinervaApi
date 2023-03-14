@@ -1,14 +1,19 @@
 package auth
 
 import (
+	create "api/FireBase"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+var authClient, _ = create.NewFireStore()
 
 func SigninHandler(c *fiber.Ctx) error {
 
@@ -23,12 +28,19 @@ func SigninHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	authUserRecord, err := authClient.GetUserByEmail(context.Background(), UserSignin.Email)
+	if err != nil {
+		log.Println(err)
+	}
+	signedinUsersId := authUserRecord.UID
+
 	confirmation := authenticationHandler(UserSignin.Email, UserSignin.Password)
 
 	_, ok := confirmation["registered"].(bool)
 	if ok {
 		resp := fiber.Map{
 			"message": "Login access permitted ",
+			"userId":  signedinUsersId,
 		}
 		return c.Status(fiber.StatusUnauthorized).JSON(resp)
 	} else {
