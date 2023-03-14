@@ -20,7 +20,8 @@ func PostTopicHandler(c *fiber.Ctx) error {
 
 	// Parse request body
 	var newTopic struct {
-		TopicName string `json:"topic_name"`
+		TopicName      string `json:"topic_name"`
+		TopicCreatorID string `json:"topic_creator_id"`
 	}
 	//Body parser, Error Handler
 	if err := c.BodyParser(&newTopic); err != nil {
@@ -36,8 +37,9 @@ func PostTopicHandler(c *fiber.Ctx) error {
 
 	// Create new Topic
 	topic := map[string]interface{}{
-		"topic_name": newTopic.TopicName,
-		"topic_id":   docRefUID.ID,
+		"topic_name":       newTopic.TopicName,
+		"topic_id":         docRefUID.ID,
+		"topic_creator_id": newTopic.TopicCreatorID,
 	}
 
 	// Add Topic to Firestore
@@ -62,7 +64,7 @@ func PostResearchHandler(c *fiber.Ctx) error {
 	var newResearch struct {
 		ResearchHeader      string `json:"research_header"`
 		ResearchContent     string `json:"research_content"`
-		ResearchCreator     string `json:"research_creator"`
+		ResearchCreatorID   string `json:"research_creator_id"`
 		ResearchContributor string `json:"research_contributor"`
 		ResearchTopicId     string `json:"research_topic_id"`
 	}
@@ -83,11 +85,11 @@ func PostResearchHandler(c *fiber.Ctx) error {
 
 	// Create new research
 	research := map[string]interface{}{
-		"research_header":      newResearch.ResearchHeader,
-		"research_content":     newResearch.ResearchContent,
-		"research_creator":     newResearch.ResearchCreator,
-		"research_contributor": newResearch.ResearchContributor,
-		"research_uid":         collectionName,
+		"research_header":     newResearch.ResearchHeader,
+		"research_content":    newResearch.ResearchContent,
+		"research_creator_id": newResearch.ResearchCreatorID,
+		"research_id":         collectionName,
+		//"research_contributor": newResearch.ResearchContributor,
 	}
 
 	// Add Research to Firestore
