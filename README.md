@@ -8,7 +8,7 @@ Add the configuration file for the Firebase SDK to the project folder.
 Create a Go module using the go mod init command.
 
 ## Usage
-To use the API, simply run the **main.go** file. The API listens on port 7334 by default. To create a new topic, send a POST request to /topic with a JSON payload containing the topic name and creator ID. To create a new research, send a POST request to /research with a JSON payload containing the research header, content, creator ID, contributor, and topic ID.
+To use the API, clone this repo and run the **main.go** file.(After insert your key to the project) The API listens on port 7334 by default. To create a new topic, send a POST request to /topic with a JSON payload containing the topic name and creator ID. To create a new research, send a POST request to /research with a JSON payload containing the research header, content, creator ID, contributor, and topic ID.
 ### Necessary Variables
 
 To run this project, you will need to add your firebase key json file to project's FireBase folder.
