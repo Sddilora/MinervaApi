@@ -68,4 +68,4 @@ Content-Type: application/json
 Contributions are welcome! Please feel free to fork this repository and submit pull requests.
 
 #### License
-This project is licensed by me :).
+-> This project is licensed by me :).
