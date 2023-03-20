@@ -12,7 +12,7 @@ import (
 func NewFireStore() (*auth.Client, *firebase.App) {
 
 	//Take file and return as opt for API to use
-	opt := option.WithCredentialsFile("C:/Users/sumey/Desktop/software/Back-End/Minerva/FireBase/key.json")
+	opt := option.WithCredentialsFile("./key.json")
 	//Creates a new App from the provided config and client options.
 	appFire, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil { //Error check
