@@ -25,8 +25,8 @@ func NewService(r Repository) ResearchService {
 }
 
 // InsertResearch is a service layer that helps insert research in Database
-func (s *service) InsertResearch(book *entities.Research) (*entities.Research, error) {
-	return s.repository.CreateResearch(book)
+func (s *service) InsertResearch(research *entities.Research) (*entities.Research, error) {
+	return s.repository.CreateResearch(research)
 }
 
 // FetchResearches is a service layer that helps fetch all researches in Database
