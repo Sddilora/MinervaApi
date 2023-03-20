@@ -23,7 +23,7 @@ func ResearchSuccessResponse(data *entities.Research) *fiber.Map {
 	newResearch := Research{
 		ResearchTitle:       data.Title,
 		ResearchContent:     data.Content,
-		ResearchCreatorID:   data.Author,
+		ResearchCreatorID:   data.AuthorID,
 		ResearchContributor: data.Contributor,
 		ResearchTopicId:     data.TopicID,
 	}

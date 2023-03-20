@@ -5,12 +5,11 @@ import (
 	"log"
 	"time"
 
-	methods "minerva_api/api/routers"
-	middlewares "minerva_api/middlewares"
-
 	"context"
 
 	"github.com/gofiber/fiber/v2"
+
+	"minerva_api/api/routes"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
@@ -23,22 +22,13 @@ func main() {
 	if err != nil {
 		log.Fatal("Database Connection Error $s", err)
 	}
-	fmt.Println("Database connection success!")
+	fmt.Println("Database connection success!", client /*just for I hate warnings ,remove that*/)
 	//Creates new fiber app
 	app := fiber.New()
 
-	//Uses middlewares
-	middlewares.FiberMiddlewares(app)
+	routes.ResearchRouter(app, appFire)
 
-	//Calls allowed post methods
-	methods.PostMethods(app)
-
-	//Calls allowed put methods
-	methods.PutMethods(app)
-
-	//Calls allowed delete methods
-	methods.DeleteMethods(app)
-
+	defer cancel()
 	//Starts the HTTP server
 	log.Fatal(app.Listen(":7334"))
 }
@@ -62,3 +52,15 @@ func databaseConnection() (*auth.Client, *firebase.App, context.CancelFunc, erro
 	return client, appFire, cancel, nil
 
 }
+
+// //Uses middlewares
+// middlewares.FiberMiddlewares(app)
+
+// //Calls allowed post methods
+// methods.PostMethods(app)
+
+// //Calls allowed put methods
+// methods.PutMethods(app)
+
+// //Calls allowed delete methods
+// methods.DeleteMethods(app)
