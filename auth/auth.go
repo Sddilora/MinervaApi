@@ -1,12 +1,12 @@
 package auth
 
 import (
-	create "api/FireBase"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
+	create "minerva_api/config"
 	"net/http"
 	"os"
 

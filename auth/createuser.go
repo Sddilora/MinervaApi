@@ -1,9 +1,9 @@
 package auth
 
 import (
-	create "api/FireBase"
 	"context"
 	"log"
+	create "minerva_api/config"
 
 	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
@@ -54,6 +54,7 @@ func CreateUserHandler(c *fiber.Ctx) error {
 		}
 		return c.Status(fiber.StatusOK).JSON(resp)
 	}
+
 }
 
 /* user update seçeneği ekleyeceğimiz zaman kullanacağız:

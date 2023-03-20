@@ -1,4 +1,4 @@
-module api
+module minerva_api
 
 go 1.19
 
