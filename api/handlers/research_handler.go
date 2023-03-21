@@ -4,16 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"minerva_api/api/presenter"
 	"minerva_api/pkg/entities"
 	"net/http"
-	"os/exec"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 )
 
@@ -33,7 +32,7 @@ func AddResearch(appFire *firebase.App) fiber.Handler {
 		if requestBody.AuthorID == "" || requestBody.Title == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.ResearchErrorResponse(errors.New(
-				"Please specify title and author")))
+				"please specify title and author")))
 		}
 
 		collectionName := UUID()
@@ -48,7 +47,6 @@ func AddResearch(appFire *firebase.App) fiber.Handler {
 
 		// Set the created and updated timestamps for the research.
 		requestBody.CreatedAt = time.Now()
-		requestBody.UpdatedAt = time.Now()
 
 		_, err := collection.Doc(collectionName).Set(context.Background(), &requestBody)
 		if err != nil {
@@ -79,8 +77,9 @@ func UpdateResearch(appFire *firebase.App) fiber.Handler {
 
 		//Updates the given parameters at the Document
 		_, err = userDoc.Update(context.Background(), []firestore.Update{
-			{Path: "research_header", Value: requestBody.Title},
-			{Path: "research_content", Value: requestBody.Content},
+			{Path: "Title", Value: requestBody.Title},
+			{Path: "Content", Value: requestBody.Content},
+			{Path: "UpdatedAt", Value: requestBody.UpdatedAt},
 			//{Path: "research_contributor", Value: updatedResearch.ResearchContributor},
 		})
 		if err != nil {
@@ -101,6 +100,7 @@ func RemoveResearch(appFire *firebase.App) fiber.Handler {
 			c.Status(http.StatusBadRequest)
 			return c.JSON(presenter.ResearchErrorResponse(err))
 		}
+
 		//Indicates the document's path
 		docRefPath := fmt.Sprintf("Topic/%s/%s/%s", requestBody.TopicID, requestBody.ID, requestBody.ID)
 
@@ -176,9 +176,6 @@ func GetResearches(appFire *firebase.App) fiber.Handler {
 
 // UUID generates a uniq id
 func UUID() string {
-	newUUID, err := exec.Command("uuidgen").Output()
-	if err != nil {
-		log.Println(err)
-	}
-	return string(newUUID)
+	newUUID := uuid.New().String()
+	return newUUID
 }

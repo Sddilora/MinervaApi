@@ -8,9 +8,9 @@ import (
 
 // Topic is the presenter object which will be taken in the request by Handler
 type Topic struct {
-	ID             string `json:"id"`
-	TopicTitle     string `json:"title"`
-	TopicCreatorID string `json:"author_id"`
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	AuthorID string `json:"author_id"`
 }
 
 // TopicSuccessResponse is the singular SuccessResponse that will be passed in the response by
@@ -18,9 +18,9 @@ type Topic struct {
 func TopicSuccessResponse(data *entities.Topic) *fiber.Map {
 
 	newTopic := Topic{
-		ID:             data.ID,
-		TopicTitle:     data.Title,
-		TopicCreatorID: data.AuthorID,
+		ID:       data.ID,
+		Title:    data.Title,
+		AuthorID: data.AuthorID,
 	}
 	return &fiber.Map{
 		"status": true,

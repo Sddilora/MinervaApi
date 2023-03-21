@@ -8,7 +8,7 @@ import (
 )
 
 // ResearchRouter is the Router for GoFiber App
-func ResearchRouter(app fiber.Router, appFire *firebase.App) {
+func ResearchRouter(app *fiber.App, appFire *firebase.App) {
 	app.Get("/researches", handlers.GetResearches(appFire))
 	app.Post("/researches", handlers.AddResearch(appFire))
 	app.Put("/researches", handlers.UpdateResearch(appFire))

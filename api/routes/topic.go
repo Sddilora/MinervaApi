@@ -8,7 +8,7 @@ import (
 )
 
 // TopicRouter is the Router for GoFiber App
-func TopicRouter(app fiber.Router, appFire *firebase.App) {
+func TopicRouter(app *fiber.App, appFire *firebase.App) {
 	app.Get("/topics", handlers.GetTopics(appFire))
 	app.Post("/topics", handlers.AddTopic(appFire))
 	app.Put("/topics", handlers.UpdateTopic(appFire))

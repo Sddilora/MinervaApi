@@ -33,8 +33,10 @@ func main() {
 
 	routes.ResearchRouter(app, appFire)
 	routes.TopicRouter(app, appFire)
+	routes.AuthRouter(app, appFire)
 
 	defer cancel()
+	defer app.Shutdown()
 	//Starts the HTTP server
 	log.Fatal(app.Listen(":8080"))
 }
@@ -42,7 +44,7 @@ func main() {
 func databaseConnection() (*auth.Client, *firebase.App, context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	//Take file and return as opt for API to use
-	opt := option.WithCredentialsFile("./key.json")
+	opt := option.WithCredentialsFile("C:/Users/sumey/Desktop/software/Back-End/Minerva/api/key.json")
 	//Creates a new App from the provided config and client options.
 	appFire, err := firebase.NewApp(ctx, nil, opt)
 	if err != nil {
@@ -58,15 +60,3 @@ func databaseConnection() (*auth.Client, *firebase.App, context.CancelFunc, erro
 	return client, appFire, cancel, nil
 
 }
-
-// //Uses middlewares
-// middlewares.FiberMiddlewares(app)
-
-// //Calls allowed post methods
-// methods.PostMethods(app)
-
-// //Calls allowed put methods
-// methods.PutMethods(app)
-
-// //Calls allowed delete methods
-// methods.DeleteMethods(app)

@@ -8,12 +8,12 @@ import (
 
 // Research is the presenter object which will be taken in the request by Handler
 type Research struct {
-	ID                  string `json:"id"`
-	ResearchTitle       string `json:"title"`
-	ResearchContent     string `json:"content"`
-	ResearchCreatorID   string `json:"author"`
-	ResearchContributor string `json:"contributor"`
-	ResearchTopicId     string `json:"topic_id"`
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Content     string `json:"content"`
+	AuthorID    string `json:"author"`
+	Contributor string `json:"contributor"`
+	TopicId     string `json:"topic_id"`
 }
 
 // ResearchSuccessResponse is the singular SuccessResponse that will be passed in the response by
@@ -21,11 +21,11 @@ type Research struct {
 func ResearchSuccessResponse(data *entities.Research) *fiber.Map {
 
 	newResearch := Research{
-		ResearchTitle:       data.Title,
-		ResearchContent:     data.Content,
-		ResearchCreatorID:   data.AuthorID,
-		ResearchContributor: data.Contributor,
-		ResearchTopicId:     data.TopicID,
+		Title:       data.Title,
+		Content:     data.Content,
+		AuthorID:    data.AuthorID,
+		Contributor: data.Contributor,
+		TopicId:     data.TopicID,
 	}
 	return &fiber.Map{
 		"status": true,

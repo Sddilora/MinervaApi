@@ -7,6 +7,7 @@ import (
 	"minerva_api/api/presenter"
 	"minerva_api/pkg/entities"
 	"net/http"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
@@ -26,10 +27,10 @@ func GetTopics(appFire *firebase.App) fiber.Handler {
 			return c.JSON(presenter.TopicErrorResponse(err))
 		}
 
-		if requestBody.AuthorID == "" || requestBody.Title == "" {
+		if requestBody.AuthorID == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"Please specify title and author")))
+				"please specify the author ")))
 		}
 
 		var topics []presenter.Topic
@@ -70,16 +71,20 @@ func AddTopic(appFire *firebase.App) fiber.Handler {
 			return c.JSON(presenter.TopicErrorResponse(err))
 		}
 
+		requestBody.CreatedAt = time.Now()
+
 		if requestBody.AuthorID == "" || requestBody.Title == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"Please specify title and author")))
+				"please specify title and author")))
 		}
 
 		// Creates a reference to a collection to Topic path.
 		userCol := Client.Collection("Topic")
 		//Creates unıq id for document
 		docRefUID := userCol.NewDoc()
+
+		requestBody.ID = docRefUID.ID
 		// Add Topic to Firestore
 		_, err := docRefUID.Set(context.Background(), &requestBody)
 		if err != nil {
@@ -105,8 +110,10 @@ func UpdateTopic(appFire *firebase.App) fiber.Handler {
 		if requestBody.AuthorID == "" || requestBody.Title == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"Please specify title and author")))
+				"please specify title and author")))
 		}
+
+		requestBody.UpdatedAt = time.Now()
 
 		//Indicates the document's path
 		docRefPath := fmt.Sprintf("Topic/%s", requestBody.ID)
@@ -115,7 +122,8 @@ func UpdateTopic(appFire *firebase.App) fiber.Handler {
 
 		//Updates the given parameters at the Document
 		_, err := userDoc.Update(context.Background(), []firestore.Update{
-			{Path: "topic_name", Value: requestBody.Title},
+			{Path: "Title", Value: requestBody.Title},
+			{Path: "UpdatedAt", Value: requestBody.UpdatedAt},
 		})
 
 		if err != nil {
@@ -138,10 +146,10 @@ func RemoveTopic(appFire *firebase.App) fiber.Handler {
 			return c.JSON(presenter.TopicErrorResponse(err))
 		}
 
-		if requestBody.AuthorID == "" || requestBody.Title == "" {
+		if requestBody.AuthorID == "" || requestBody.ID == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"Please specify title and author")))
+				"please specify the ID and author")))
 		}
 
 		//Indicates the document's path
