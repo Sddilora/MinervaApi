@@ -81,7 +81,7 @@ Content-Type: application/json
 
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
-| `data`    | `map[string]string` |`"name" `: "User's fullname" <br> `"email"` : "user@example.com" <br> `"title"` : "Research's title" <br> `"password"` : "" <br> `"photo_url"` : "user.png" |
+| `data`    | `map[string]string` |`"name" `: "User's fullname" <br> `"email"` : "user@example.com" <br> `"title"` : "Research's title"<br> `"photo_url"` : "user.png" |
 | `error`    | `string` |"null"        |
 | `status`    | `string` |"true"        |
 
