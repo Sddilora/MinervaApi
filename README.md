@@ -20,19 +20,6 @@ your private key will be downloaded to your device.
 
 
 #### Example Requests
-
-```http
-POST /signin HTTP/1.1
-Host: localhost:8080
-Content-Type: application/json
-```
-
-| Parameter | Type     | Value                |
-| :-------- | :------- | :------------------------- |
-|`name` | `string` | "User's fullname" |
-|`password` | `string` | "123456" |
-
-
 ```http
 POST /user HTTP/1.1
 Host: localhost:8080
@@ -45,6 +32,19 @@ Content-Type: application/json
 |`email` | `string` | "user@example.com" |
 |`password` | `string` | "123456" |
 |`photo_url` | `string` | "user.png" |
+
+
+```http
+POST /signin HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+```
+
+| Parameter | Type     | Value                |
+| :-------- | :------- | :------------------------- |
+|`email` | `string` | "user@example.com" |
+|`password` | `string` | "123456" |
+
 
 ```http
 POST /topics HTTP/1.1
@@ -72,18 +72,7 @@ Content-Type: application/json
 | `"contributor"` | `string` | "54321" |
 | `"topic_id"` | `string` | "67890" |
 
-
 #### Example Responses
-
-```http
-HTTP/1.1 401 Unauthorized
-Content-Type: application/json
-```
-| Parameter | Type     | Value                |
-| :-------- | :------- | :------------------------- |
-| `"jwt"` | `string` | "[JWT]" |
-| `"message"` | `string` | "Login access permitted" |
-| `"author_id"` | `string` | "12345" |
 
 ```http
 HTTP/1.1 200 OK
@@ -99,6 +88,16 @@ Content-Type: application/json
 |  |  |"photo_url"        | "user.png" |
 | `error`    | `string` |"null"        ||
 | `status`    | `string` |"true"        ||
+
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+```
+| Parameter | Type     | Value                |
+| :-------- | :------- | :------------------------- |
+| `"jwt"` | `string` | "[JWT]" |
+| `"message"` | `string` | "Login access permitted" |
+| `"author_id"` | `string` | "12345" |
 
 ```http
 HTTP/1.1 200 OK
