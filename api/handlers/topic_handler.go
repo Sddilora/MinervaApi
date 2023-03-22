@@ -72,6 +72,7 @@ func AddTopic(appFire *firebase.App) fiber.Handler {
 		}
 
 		requestBody.CreatedAt = time.Now()
+		requestBody.UpdatedAt = time.Now()
 
 		if requestBody.AuthorID == "" || requestBody.Title == "" {
 			c.Status(http.StatusInternalServerError)

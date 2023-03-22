@@ -47,6 +47,7 @@ func AddResearch(appFire *firebase.App) fiber.Handler {
 
 		// Set the created and updated timestamps for the research.
 		requestBody.CreatedAt = time.Now()
+		requestBody.UpdatedAt = time.Now()
 
 		_, err := collection.Doc(collectionName).Set(context.Background(), &requestBody)
 		if err != nil {
