@@ -73,14 +73,14 @@ func Signin(appFire *firebase.App) fiber.Handler {
 		_, ok := confirmation["registered"].(bool)
 		if ok {
 			resp := fiber.Map{
-				"message": "Login access permitted ",
-				"userId":  signedinUsersId,
-				"jwt":     JWT,
+				"message":   "Login access permitted",
+				"author_id": signedinUsersId,
+				"jwt":       JWT,
 			}
 			return c.Status(fiber.StatusUnauthorized).JSON(resp)
 		} else {
 			resp := fiber.Map{
-				"message": "Login access denied ",
+				"message": "Login access denied",
 			}
 			return c.Status(fiber.StatusOK).JSON(resp)
 		}

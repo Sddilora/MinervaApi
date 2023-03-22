@@ -20,6 +20,32 @@ your private key will be downloaded to your device.
 
 
 #### Example Requests
+
+```http
+POST /signin HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+```
+
+| Parameter | Type     | Value                |
+| :-------- | :------- | :------------------------- |
+|`name` | `string` | "User's fullname" |
+|`password` | `string` | "123456" |
+
+
+```http
+POST /user HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+```
+
+| Parameter | Type     | Value                |
+| :-------- | :------- | :------------------------- |
+|`name` | `string` | "User's fullname" |
+|`email` | `string` | "user@example.com" |
+|`password` | `string` | "123456" |
+|`photo_url` | `string` | "user.png" |
+
 ```http
 POST /topics HTTP/1.1
 Host: localhost:8080
@@ -48,6 +74,32 @@ Content-Type: application/json
 
 
 #### Example Responses
+
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+```
+| Parameter | Type     | Value                |
+| :-------- | :------- | :------------------------- |
+| `"jwt"` | `string` | "[JWT]" |
+| `"message"` | `string` | "Login access permitted" |
+| `"author_id"` | `string` | "12345" |
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+
+| Parameter | Type     | Value                |
+| :-------- | :------- | :------------------------- |
+| `data`    | `map[string]string` |"name"        | "User's fullname" |
+|  |  |"email"        | "user@example.com" |
+|  |  |"title"        | "Research's title" |
+|  |  |"password"        | "" |
+|  |  |"photo_url"        | "user.png" |
+| `error`    | `string` |"null"        ||
+| `status`    | `string` |"true"        ||
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
