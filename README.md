@@ -54,27 +54,17 @@ Content-Type: application/json
 ```
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
-| `data`    | `map[string]string` |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
-|  |  |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
-|  |  |"title"        | "Research's title" |
-|  |  |"author_id"        | "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" |
-|  |  |"topic_id"        | "xxxxxxxxxxxxxxxxxxxx" |
-| `error`    | `string` |"null"        ||
-| `status`    | `string` |"true"        ||
+| `data`    | `map[string]string` |` "id" `:      "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx"  <br>  `"title"` :     "Research's title"  <br>  `"author_id"` :  "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" <br> `"topic_id"` :  "xxxxxxxxxxxxxxxxxxxx"    |  
+| `error`    | `string` |"null"        |
+| `status`    | `string` |"true"        |
 
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
 ```
-| Parameter | Type                |Key         | Value                      |
-| :-------- | :------------------ |:-----------| :------------------------- |
-| `data`    | `map[string]string` |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
-|  |  |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
-|  |  |"title"        | "Research's title" |
-|  |  |"content"        | "paragraph1" |
-|  |  |"author"        | "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" |
-|  |  |"contributor"        | "Me" |
-|  |  |"topic_id"        | "xxxxxxxxxxxxxxxxxxxx" |
+| Parameter | Type                |Key         |                       
+| :-------- | :------------------ |:-----------|  
+| `data`    | `map[string]string` |` "id" `:     "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx"  <br>  `"title"` :     "Research's title"  <br>  `"author_id"` :  "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" <br> `"topic_id"` :  "xxxxxxxxxxxxxxxxxxxx"  <br> `"content"` : "paragraph1" <br> `"contributor"` : "Me" | 
 | `error`    | `string` |"null"        ||
 | `status`    | `string` |"true"        ||
 
