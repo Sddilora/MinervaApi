@@ -11,7 +11,7 @@ Create a Go module using the go mod init command.
 To use the API, clone this repo and run the **main.go** file.(After insert your key to the project) The API listens on port 8080 by default. To create a new topic, send a POST request to /topic with a JSON payload containing the topic title and author JWT. To create a new research, send a POST request to /topic/research with a JSON payload containing the research title, content, author jwt, contributor, and topic ID.
 ### Necessary Variables
 
-To run this project, you will need to add your firebase key json file to project's FireBase folder.
+To run this project, you will need to add your firebase key json file to project's api folder.
 
 `key.json`
 
