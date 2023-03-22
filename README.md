@@ -81,13 +81,9 @@ Content-Type: application/json
 
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
-| `data`    | `map[string]string` |"name"        | "User's fullname" |
-|  |  |"email"        | "user@example.com" |
-|  |  |"title"        | "Research's title" |
-|  |  |"password"        | "" |
-|  |  |"photo_url"        | "user.png" |
-| `error`    | `string` |"null"        ||
-| `status`    | `string` |"true"        ||
+| `data`    | `map[string]string` |`"name" `: "User's fullname" <br> `"email"` : "user@example.com" <br> `"title"` : "Research's title" `"password"` : "" <br> `"photo_url"` : "user.png" |
+| `error`    | `string` |"null"        |
+| `status`    | `string` |"true"        |
 
 ```http
 HTTP/1.1 401 Unauthorized
