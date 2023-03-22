@@ -15,7 +15,7 @@ To run this project, you will need to add your firebase key json file to project
 
 `key.json`
 
-You can find your private key on Your firebase account -> Your firebase project -> Project Settings ->Service accounts -> Firebase Admin SDK -> (I choose Node.js) Generate new private key
+You can find your private key on Your firebase account -> Your firebase project -> Project Settings ->Service accounts -> Firebase Admin SDK -> (I choose Node.js) Generate new private key =>
 your private key will be downloaded to your device.
 
 
