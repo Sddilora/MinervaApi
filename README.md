@@ -21,48 +21,63 @@ your private key will be downloaded to your device.
 
 #### Example Requests
 ```http
-POST /topic HTTP/1.1
-Host: localhost:7334
+POST /topics HTTP/1.1
+Host: localhost:8080
 Content-Type: application/json
 ```
 
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
-| `topic_name` | `string` | "Example Topic" |
-| `topic_creator_id` | `string` | "12345" |
+| `title` | `string` | "Example Topic" |
+| `author_jwt` | `string` | "12345" |
 
-(topic_creator_id and research_creator_id (They are user's id) will be sent by api if signin is succesfull)
+(author_jwt (They are current user's jwt) will be sent by api if signin is succesfull)
 
 ```http
 POST /topic/research HTTP/1.1
-Host: localhost:7334
+Host: localhost:8080
 Content-Type: application/json
 ```
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
-| `research_header` | `string` | "Example Research" |
-| `"research_content` | `string` | "paragraph1" |
-| `"research_creator_id` | `string` | "12345" |
-| `"research_contributor` | `string` | "54321" |
-| `"research_topic_id` | `string` | "67890" |
+| `"title"` | `string` | "Example Research" |
+| `"content"` | `string` | "paragraph1" |
+| `"author_id"` | `string` | "12345" |
+| `"contributor"` | `string` | "54321" |
+| `"topic_id"` | `string` | "67890" |
 
 
 #### Example Responses
 ```http
-HTTP/1.1 201 Created
+HTTP/1.1 200 OK
 Content-Type: application/json
 ```
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
-| `message` | `string` | "Topic created successfully" |
+| `data`    | `map[string]string` |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
+|  |  |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
+|  |  |"title"        | "Research's title" |
+|  |  |"author_id"        | "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" |
+|  |  |"topic_id"        | "xxxxxxxxxxxxxxxxxxxx" |
+| `error`    | `string` |"null"        ||
+| `status`    | `string` |"true"        ||
 
 ```http
-HTTP/1.1 201 Created
+HTTP/1.1 200 OK
 Content-Type: application/json
 ```
-| Parameter | Type     | Value                |
-| :-------- | :------- | :------------------------- |
-| `message` | `string` | "Research created successfully" |
+| Parameter | Type                |Key         | Value                      |
+| :-------- | :------------------ |:-----------| :------------------------- |
+| `data`    | `map[string]string` |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
+|  |  |"id"        | "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx" |
+|  |  |"title"        | "Research's title" |
+|  |  |"content"        | "paragraph1" |
+|  |  |"author"        | "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" |
+|  |  |"contributor"        | "Me" |
+|  |  |"topic_id"        | "xxxxxxxxxxxxxxxxxxxx" |
+| `error`    | `string` |"null"        ||
+| `status`    | `string` |"true"        ||
+
 
 ## Contributing
 Contributions are welcome! Please feel free to fork this repository and submit pull requests.

@@ -21,6 +21,7 @@ type Research struct {
 func ResearchSuccessResponse(data *entities.Research) *fiber.Map {
 
 	newResearch := Research{
+		ID:          data.ID,
 		Title:       data.Title,
 		Content:     data.Content,
 		AuthorID:    data.AuthorID,
