@@ -123,6 +123,45 @@ func RemoveResearch(appFire *firebase.App) fiber.Handler {
 	}
 }
 
+// GetResearch is handler/controller which lists single Research from the database
+func GetResearchByID(appFire *firebase.App) fiber.Handler {
+	Client, _ := appFire.Firestore(context.Background())
+	return func(c *fiber.Ctx) error {
+
+		// Extract the research ID from the URL path
+		id := c.Params("id")
+
+		var requestBody entities.Research
+
+		err := c.BodyParser(&requestBody)
+		if err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(presenter.ResearchErrorResponse(err))
+		}
+
+		//var researches []presenter.Research
+
+		//Indicates the document's path
+		docPath := fmt.Sprintf("Topic/%s/%s/%s", requestBody.TopicID, id, id)
+		//Indicates to document
+		userDoc := Client.Doc(docPath)
+
+		docSnapShot, err := userDoc.Get(context.Background())
+		if err != nil {
+			c.Status(http.StatusBadRequest)
+			return c.JSON(presenter.ResearchErrorResponse(err))
+		}
+
+		data := docSnapShot.Data()
+
+		return c.JSON(&fiber.Map{
+			"status": true,
+			"data":   &data,
+			"err":    nil,
+		})
+	}
+}
+
 // GetResearches is handler/controller which lists all Researches from the database
 func GetResearches(appFire *firebase.App) fiber.Handler {
 	Client, _ := appFire.Firestore(context.Background())
