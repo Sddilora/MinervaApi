@@ -13,9 +13,9 @@ type User struct {
 	PhotoUrl string `json:"photo_url"`
 }
 
-// AuthSuccessResponse is the singular SuccessResponse that will be passed in the response by
+// UserSuccessResponse is the singular SuccessResponse that will be passed in the response by
 // Handler
-func AuthSuccessResponse(data *entities.User) *fiber.Map {
+func UserSuccessResponse(data *entities.User) *fiber.Map {
 
 	newUser := User{
 		Name:     data.Name,
@@ -30,7 +30,7 @@ func AuthSuccessResponse(data *entities.User) *fiber.Map {
 }
 
 // TopicErrorResponse is the ErrorResponse that will be passed in the response by Handler
-func AuthErrorResponse(err error) *fiber.Map {
+func UserErrorResponse(err error) *fiber.Map {
 	return &fiber.Map{
 		"status": false,
 		"data":   "",

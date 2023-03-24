@@ -26,7 +26,7 @@ func AddUser(appFire *firebase.App) fiber.Handler {
 		//Body Parser,Error Handler
 		if err := c.BodyParser(&requestBody); err != nil {
 			c.Status(http.StatusBadRequest)
-			return c.JSON(presenter.AuthErrorResponse(err))
+			return c.JSON(presenter.UserErrorResponse(err))
 		}
 
 		requestBody.CreatedAt = time.Now()
@@ -41,10 +41,10 @@ func AddUser(appFire *firebase.App) fiber.Handler {
 		_, err := AuthClient.CreateUser(context.Background(), params)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
-			return c.JSON(presenter.AuthErrorResponse(err))
+			return c.JSON(presenter.UserErrorResponse(err))
 		}
 
-		return c.JSON(presenter.AuthSuccessResponse(requestBody))
+		return c.JSON(presenter.UserSuccessResponse(requestBody))
 
 	}
 }
@@ -57,7 +57,7 @@ func Signin(appFire *firebase.App) fiber.Handler {
 		//Body Parser,Error Handler
 		if err := c.BodyParser(&requestBody); err != nil {
 			c.Status(http.StatusBadRequest)
-			return c.JSON(presenter.AuthErrorResponse(err))
+			return c.JSON(presenter.UserErrorResponse(err))
 		}
 		authUserRecord, err := AuthClient.GetUserByEmail(context.Background(), requestBody.Email)
 		if err != nil {
@@ -96,7 +96,7 @@ func UpdateUser(appFire *firebase.App) fiber.Handler {
 		//Body Parser,Error Handler
 		if err := c.BodyParser(&requestBody); err != nil {
 			c.Status(http.StatusBadRequest)
-			return c.JSON(presenter.AuthErrorResponse(err))
+			return c.JSON(presenter.UserErrorResponse(err))
 		}
 		authUserRecord, err := AuthClient.GetUser(context.Background(), requestBody.ID)
 		if err != nil {
@@ -112,7 +112,7 @@ func UpdateUser(appFire *firebase.App) fiber.Handler {
 		_, err = AuthClient.UpdateUser(context.Background(), uid, params)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
-			return c.JSON(presenter.AuthErrorResponse(err))
+			return c.JSON(presenter.UserErrorResponse(err))
 		}
 		return c.JSON(&fiber.Map{
 			"status":  true,
@@ -130,7 +130,7 @@ func RemoveUser(appFire *firebase.App) fiber.Handler {
 		//Body Parser,Error Handler
 		if err := c.BodyParser(&requestBody); err != nil {
 			c.Status(http.StatusBadRequest)
-			return c.JSON(presenter.AuthErrorResponse(err))
+			return c.JSON(presenter.UserErrorResponse(err))
 		}
 		authUserRecord, err := AuthClient.GetUser(context.Background(), requestBody.ID)
 		if err != nil {
@@ -141,7 +141,7 @@ func RemoveUser(appFire *firebase.App) fiber.Handler {
 		err = AuthClient.DeleteUser(context.Background(), uid)
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
-			return c.JSON(presenter.AuthErrorResponse(err))
+			return c.JSON(presenter.UserErrorResponse(err))
 		}
 		return c.JSON(&fiber.Map{
 			"status":  true,
