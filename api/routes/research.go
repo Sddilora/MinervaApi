@@ -14,4 +14,5 @@ func ResearchRouter(app *fiber.App, appFire *firebase.App) {
 	app.Post("/topic/research", handlers.AddResearch(appFire))
 	app.Put("/topic/research", handlers.UpdateResearch(appFire))
 	app.Delete("/topic/research", handlers.RemoveResearch(appFire))
+	app.Post("/topic/research/upload", handlers.PostPDF(appFire))
 }
