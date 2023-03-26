@@ -7,9 +7,12 @@ import (
 	"minerva_api/api/presenter"
 	"minerva_api/pkg/entities"
 	"net/http"
+	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
+	"cloud.google.com/go/storage"
+
 	firebase "firebase.google.com/go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -211,6 +214,51 @@ func GetResearches(appFire *firebase.App) fiber.Handler {
 			"err":    nil,
 		})
 
+	}
+}
+
+func PostPDF(appFire *firebase.App) fiber.Handler {
+	client, _ := storage.NewClient(context.Background())
+	return func(c *fiber.Ctx) error {
+		// Parse the multipart form:
+		if form, err := c.MultipartForm(); err == nil {
+			// => *multipart.Form
+
+			if token := form.Value["token"]; len(token) > 0 {
+				// Get key value:
+				fmt.Println(token[0])
+			}
+
+			// Get all files from "documents" key:
+			files := form.File["documents"]
+			// => []*multipart.FileHeader
+
+			// Loop through files:
+			for _, file := range files {
+				fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0])
+				// => "tutorial.pdf" 360641 "application/pdf"
+
+				// Save the files to disk:
+				if err := c.SaveFile(file, fmt.Sprintf("./%s", file.Filename)); err != nil {
+					return err
+				}
+
+				dat, _ := os.ReadFile(file.Filename)
+				// Upload the files to firebase storage:
+				wc := client.Bucket("bucket-name").Object(file.Filename).NewWriter(context.Background())
+				wc.ContentType = file.Header["Content-Type"][0]
+				// write the file to the bucket
+				if _, err := wc.Write(dat); err != nil {
+					return err
+				}
+				if err := wc.Close(); err != nil {
+					return err
+				}
+				// print the file url
+				fmt.Println(wc.Attrs().MediaLink)
+			}
+		}
+		return c.JSON("ok")
 	}
 }
 
