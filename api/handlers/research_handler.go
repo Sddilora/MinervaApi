@@ -87,7 +87,6 @@ func UpdateResearch(appFire *firebase.App) fiber.Handler {
 			{Path: "Title", Value: requestBody.Title},
 			{Path: "Content", Value: requestBody.Content},
 			{Path: "UpdatedAt", Value: requestBody.UpdatedAt},
-			//{Path: "research_contributor", Value: updatedResearch.ResearchContributor},
 		})
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
@@ -219,6 +218,7 @@ func GetResearches(appFire *firebase.App) fiber.Handler {
 
 	}
 }
+
 func PostPDF(appFire *firebase.App) fiber.Handler {
 	client, err := storage.NewClient(context.Background(), option.WithCredentialsFile("C:\\Users\\sumey\\Desktop\\software\\Back-End\\Minerva\\api\\key.json"))
 	if err != nil {
@@ -234,6 +234,10 @@ func PostPDF(appFire *firebase.App) fiber.Handler {
 		if form, err := c.MultipartForm(); err == nil {
 			// Get all files from "documents" key:
 			files := form.File["pdf"]
+
+			// Initialize urls slice
+			var urls []string
+
 			// Loop through files:
 			for _, file := range files {
 				// Save the files to Firebase Storage:
@@ -253,7 +257,6 @@ func PostPDF(appFire *firebase.App) fiber.Handler {
 				}
 				// print the file url
 				url := wc.Attrs().MediaLink
-				log.Println(url)
 
 				//Get topicID and researchID from request
 				topicID := form.Value["topic_id"]
@@ -267,11 +270,38 @@ func PostPDF(appFire *firebase.App) fiber.Handler {
 				docRefPath := fmt.Sprintf("Topic/%v/%v/%v", topicIDstring, researchIDstring, researchIDstring)
 				//Indicates to document
 				userDoc := firestoreClient.Doc(docRefPath)
-				log.Println(docRefPath)
+				//Retrieve the document
+				docSnap, err := userDoc.Get(context.Background())
+				if err != nil {
+					c.Status(http.StatusInternalServerError)
+					return c.JSON(presenter.ResearchErrorResponse(err))
+				}
+
+				//Get the existing URLs
+				data := docSnap.Data()
+
+				// Check if "PdfUrl" field exists in the document
+				if pdfUrls, ok := data["PdfUrl"].([]interface{}); ok {
+
+					for _, url := range pdfUrls {
+						urls = append(urls, url.(string))
+					}
+				}
+
+				//Append the new URL to the existing URLs
+				urls = append(urls, url)
 
 				//Saves the pdf's url at the Document
+				_, err = userDoc.Set(context.Background(), map[string][]string{
+					"PdfUrl": urls,
+				}, firestore.MergeAll)
+				if err != nil {
+					c.Status(http.StatusInternalServerError)
+					return c.JSON(presenter.ResearchErrorResponse(err))
+				}
+				//Updates the given parameters at the Document
 				_, err = userDoc.Update(context.Background(), []firestore.Update{
-					{Path: "pdf_url", Value: url},
+					{Path: "UpdatedAt", Value: time.Now()},
 				})
 				if err != nil {
 					c.Status(http.StatusInternalServerError)
@@ -279,7 +309,101 @@ func PostPDF(appFire *firebase.App) fiber.Handler {
 				}
 			}
 		}
-		return c.JSON("ok")
+		return c.JSON("Pdf url saved to database succesfully")
+	}
+}
+
+func PostImage(appFire *firebase.App) fiber.Handler {
+	client, err := storage.NewClient(context.Background(), option.WithCredentialsFile("C:\\Users\\sumey\\Desktop\\software\\Back-End\\Minerva\\api\\key.json"))
+	if err != nil {
+		log.Printf("Failed to create client: %v", err)
+	}
+
+	firestoreClient, err := appFire.Firestore(context.Background())
+	if err != nil {
+		log.Printf("Failed to create firestore client: %v", err)
+	}
+	return func(c *fiber.Ctx) error {
+		// Parse the multipart form:
+		if form, err := c.MultipartForm(); err == nil {
+			// Get all files from "documents" key:
+			files := form.File["image"]
+
+			// Initialize urls slice
+			var urls []string
+
+			// Loop through files:
+			for _, file := range files {
+				// Save the files to Firebase Storage:
+				wc := client.Bucket("minerva-95196.appspot.com").Object(file.Filename).NewWriter(context.Background())
+				wc.ContentType = file.Header["Content-Type"][0]
+				// open the uploaded file
+				f, err := file.Open()
+				if err != nil {
+					return err
+				}
+				// write the file to the bucket
+				if _, err := io.Copy(wc, f); err != nil {
+					return err
+				}
+				if err := wc.Close(); err != nil {
+					return err
+				}
+				// print the file url
+				url := wc.Attrs().MediaLink
+
+				//Get topicID and researchID from request
+				topicID := form.Value["topic_id"]
+				researchID := form.Value["research_id"]
+
+				//Convert []string to string
+				topicIDstring := strings.Join(topicID, "")
+				researchIDstring := strings.Join(researchID, "")
+
+				//Indicates te firestore document path
+				docRefPath := fmt.Sprintf("Topic/%v/%v/%v", topicIDstring, researchIDstring, researchIDstring)
+				//Indicates to document
+				userDoc := firestoreClient.Doc(docRefPath)
+				//Retrieve the document
+				docSnap, err := userDoc.Get(context.Background())
+				if err != nil {
+					c.Status(http.StatusInternalServerError)
+					return c.JSON(presenter.ResearchErrorResponse(err))
+				}
+
+				//Get the existing URLs
+				data := docSnap.Data()
+
+				// Check if "PdfUrl" field exists in the document
+				if pdfUrls, ok := data["ImageUrl"].([]interface{}); ok {
+
+					for _, url := range pdfUrls {
+						urls = append(urls, url.(string))
+					}
+				}
+
+				//Append the new URL to the existing URLs
+				urls = append(urls, url)
+
+				//Saves the pdf's url at the Document
+				_, err = userDoc.Set(context.Background(), map[string][]string{
+					"ImageUrl": urls,
+				}, firestore.MergeAll)
+				if err != nil {
+					c.Status(http.StatusInternalServerError)
+					return c.JSON(presenter.ResearchErrorResponse(err))
+				}
+				//Updates the given parameters at the Document
+				_, err = userDoc.Update(context.Background(), []firestore.Update{
+					{Path: "UpdatedAt", Value: time.Now()},
+				})
+				if err != nil {
+					c.Status(http.StatusInternalServerError)
+					return c.JSON(presenter.ResearchErrorResponse(err))
+				}
+			}
+		}
+		return c.JSON("Image url saved to database succesfully")
 	}
 }
 
