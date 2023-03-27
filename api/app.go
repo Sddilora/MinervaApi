@@ -33,7 +33,6 @@ func main() {
 
 	routes.ResearchRouter(app, appFire)
 	routes.TopicRouter(app, appFire)
-	routes.AuthRouter(app, appFire)
 
 	defer cancel()
 	defer app.Shutdown()

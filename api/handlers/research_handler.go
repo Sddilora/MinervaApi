@@ -35,10 +35,10 @@ func AddResearch(appFire *firebase.App) fiber.Handler {
 			return c.JSON(presenter.ResearchErrorResponse(err))
 		}
 
-		if requestBody.AuthorID == "" || requestBody.Title == "" {
+		if requestBody.TopicID == "" || requestBody.Title == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.ResearchErrorResponse(errors.New(
-				"please specify title and author")))
+				"please specify title and the topic id")))
 		}
 
 		collectionName := UUID()

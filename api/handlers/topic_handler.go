@@ -27,12 +27,6 @@ func GetTopics(appFire *firebase.App) fiber.Handler {
 			return c.JSON(presenter.TopicErrorResponse(err))
 		}
 
-		if requestBody.AuthorID == "" {
-			c.Status(http.StatusInternalServerError)
-			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"please specify the author ")))
-		}
-
 		var topics []presenter.Topic
 		// Creates a reference to a collection to Topic path.
 		userCol := Client.Collection("Topic")
@@ -74,10 +68,10 @@ func AddTopic(appFire *firebase.App) fiber.Handler {
 		requestBody.CreatedAt = time.Now()
 		requestBody.UpdatedAt = time.Now()
 
-		if requestBody.AuthorID == "" || requestBody.Title == "" {
+		if requestBody.ID == "" || requestBody.Title == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"please specify title and author")))
+				"please specify title and topic id")))
 		}
 
 		// Creates a reference to a collection to Topic path.
@@ -108,10 +102,10 @@ func UpdateTopic(appFire *firebase.App) fiber.Handler {
 			return c.JSON(presenter.TopicErrorResponse(err))
 		}
 
-		if requestBody.AuthorID == "" || requestBody.Title == "" {
+		if requestBody.ID == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"please specify title and author")))
+				"please specify the Topic ID")))
 		}
 
 		requestBody.UpdatedAt = time.Now()
@@ -147,10 +141,10 @@ func RemoveTopic(appFire *firebase.App) fiber.Handler {
 			return c.JSON(presenter.TopicErrorResponse(err))
 		}
 
-		if requestBody.AuthorID == "" || requestBody.ID == "" {
+		if requestBody.ID == "" {
 			c.Status(http.StatusInternalServerError)
 			return c.JSON(presenter.TopicErrorResponse(errors.New(
-				"please specify the ID and author")))
+				"please specify the Topic ID ")))
 		}
 
 		//Indicates the document's path
