@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"minerva_api/api/presenter"
 	"minerva_api/pkg/entities"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
 )
 
 // AddResearch is handler/controller which creates Researches in the Database
@@ -218,21 +220,21 @@ func GetResearches(appFire *firebase.App) fiber.Handler {
 }
 
 func PostPDF(appFire *firebase.App) fiber.Handler {
-	client, _ := storage.NewClient(context.Background())
+	client, err := storage.NewClient(context.Background(), option.WithCredentialsFile("C:\\Users\\b1\\Documents\\MinervaApi\\api\\key.json"))
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
 	return func(c *fiber.Ctx) error {
+		fmt.Println(client)
+		fmt.Println("PostPDF")
 		// Parse the multipart form:
 		if form, err := c.MultipartForm(); err == nil {
-			// => *multipart.Form
-
-			if token := form.Value["token"]; len(token) > 0 {
-				// Get key value:
-				fmt.Println(token[0])
-			}
+			fmt.Println("inside if")
 
 			// Get all files from "documents" key:
-			files := form.File["documents"]
+			files := form.File["pdf"]
 			// => []*multipart.FileHeader
-
+			fmt.Println(files)
 			// Loop through files:
 			for _, file := range files {
 				fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0])
@@ -243,19 +245,28 @@ func PostPDF(appFire *firebase.App) fiber.Handler {
 					return err
 				}
 
+				fmt.Println("file saved")
 				dat, _ := os.ReadFile(file.Filename)
+				fmt.Println("file read")
+
 				// Upload the files to firebase storage:
-				wc := client.Bucket("bucket-name").Object(file.Filename).NewWriter(context.Background())
+				client.Bucket("minerva-95196.appspot.com").ACL().Set(context.Background(), "allUsers", storage.RoleReader)
+				wc := client.Bucket("minerva-95196.appspot.com").Object(file.Filename).NewWriter(context.Background())
+				fmt.Println("object created")
 				wc.ContentType = file.Header["Content-Type"][0]
+				fmt.Println("set header")
 				// write the file to the bucket
-				if _, err := wc.Write(dat); err != nil {
+				if _, err := wc.Write([]byte(dat)); err != nil {
 					return err
 				}
+				fmt.Println("object written")
+
 				if err := wc.Close(); err != nil {
 					return err
 				}
 				// print the file url
-				fmt.Println(wc.Attrs().MediaLink)
+				url := wc.Attrs().MediaLink
+				fmt.Println(url)
 			}
 		}
 		return c.JSON("ok")
