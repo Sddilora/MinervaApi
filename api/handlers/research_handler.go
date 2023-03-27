@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"minerva_api/api/presenter"
 	"minerva_api/pkg/entities"
 	"net/http"
-	"os"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -218,55 +219,64 @@ func GetResearches(appFire *firebase.App) fiber.Handler {
 
 	}
 }
-
 func PostPDF(appFire *firebase.App) fiber.Handler {
-	client, err := storage.NewClient(context.Background(), option.WithCredentialsFile("C:\\Users\\b1\\Documents\\MinervaApi\\api\\key.json"))
+	client, err := storage.NewClient(context.Background(), option.WithCredentialsFile("C:\\Users\\sumey\\Desktop\\software\\Back-End\\Minerva\\api\\key.json"))
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Printf("Failed to create client: %v", err)
+	}
+
+	firestoreClient, err := appFire.Firestore(context.Background())
+	if err != nil {
+		log.Printf("Failed to create firestore client: %v", err)
 	}
 	return func(c *fiber.Ctx) error {
-		fmt.Println(client)
-		fmt.Println("PostPDF")
 		// Parse the multipart form:
 		if form, err := c.MultipartForm(); err == nil {
-			fmt.Println("inside if")
-
 			// Get all files from "documents" key:
 			files := form.File["pdf"]
-			// => []*multipart.FileHeader
-			fmt.Println(files)
 			// Loop through files:
 			for _, file := range files {
-				fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0])
-				// => "tutorial.pdf" 360641 "application/pdf"
-
-				// Save the files to disk:
-				if err := c.SaveFile(file, fmt.Sprintf("./%s", file.Filename)); err != nil {
-					return err
-				}
-
-				fmt.Println("file saved")
-				dat, _ := os.ReadFile(file.Filename)
-				fmt.Println("file read")
-
-				// Upload the files to firebase storage:
-				client.Bucket("minerva-95196.appspot.com").ACL().Set(context.Background(), "allUsers", storage.RoleReader)
+				// Save the files to Firebase Storage:
 				wc := client.Bucket("minerva-95196.appspot.com").Object(file.Filename).NewWriter(context.Background())
-				fmt.Println("object created")
 				wc.ContentType = file.Header["Content-Type"][0]
-				fmt.Println("set header")
-				// write the file to the bucket
-				if _, err := wc.Write([]byte(dat)); err != nil {
+				// open the uploaded file
+				f, err := file.Open()
+				if err != nil {
 					return err
 				}
-				fmt.Println("object written")
-
+				// write the file to the bucket
+				if _, err := io.Copy(wc, f); err != nil {
+					return err
+				}
 				if err := wc.Close(); err != nil {
 					return err
 				}
 				// print the file url
 				url := wc.Attrs().MediaLink
-				fmt.Println(url)
+				log.Println(url)
+
+				//Get topicID and researchID from request
+				topicID := form.Value["topic_id"]
+				researchID := form.Value["research_id"]
+
+				//Convert []string to string
+				topicIDstring := strings.Join(topicID, "")
+				researchIDstring := strings.Join(researchID, "")
+
+				//Indicates te firestore document path
+				docRefPath := fmt.Sprintf("Topic/%v/%v/%v", topicIDstring, researchIDstring, researchIDstring)
+				//Indicates to document
+				userDoc := firestoreClient.Doc(docRefPath)
+				log.Println(docRefPath)
+
+				//Saves the pdf's url at the Document
+				_, err = userDoc.Update(context.Background(), []firestore.Update{
+					{Path: "pdf_url", Value: url},
+				})
+				if err != nil {
+					c.Status(http.StatusInternalServerError)
+					return c.JSON(presenter.ResearchErrorResponse(err))
+				}
 			}
 		}
 		return c.JSON("ok")
