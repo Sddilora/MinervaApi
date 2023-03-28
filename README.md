@@ -20,31 +20,6 @@ your private key will be downloaded to your device.
 
 
 #### Example Requests
-```http
-POST /user HTTP/1.1
-Host: localhost:8080
-Content-Type: application/json
-```
-
-| Parameter | Type     | Value                |
-| :-------- | :------- | :------------------------- |
-|`name` | `string` | "User's fullname" |
-|`email` | `string` | "user@example.com" |
-|`password` | `string` | "123456" |
-|`photo_url` | `string` | "user.png" |
-
-
-```http
-POST /signin HTTP/1.1
-Host: localhost:8080
-Content-Type: application/json
-```
-
-| Parameter | Type     | Value                |
-| :-------- | :------- | :------------------------- |
-|`email` | `string` | "user@example.com" |
-|`password` | `string` | "123456" |
-
 
 ```http
 POST /topics HTTP/1.1
@@ -55,9 +30,7 @@ Content-Type: application/json
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
 | `title` | `string` | "Example Topic" |
-| `author_jwt` | `string` | "[JWT]" |
 
-(author_jwt (They are current user's jwt) will be sent by api if signin is succesfull)
 
 ```http
 POST /topic/research HTTP/1.1
@@ -68,8 +41,6 @@ Content-Type: application/json
 | :-------- | :------- | :------------------------- |
 | `"title"` | `string` | "Example Research" |
 | `"content"` | `string` | "paragraph1" |
-| `"author_jwt"` | `string` | "[JWT]" |
-| `"contributor"` | `string` | "54321" |
 | `"topic_id"` | `string` | "67890" |
 
 #### Example Responses
@@ -78,30 +49,9 @@ Content-Type: application/json
 HTTP/1.1 200 OK
 Content-Type: application/json
 ```
-
 | Parameter | Type     | Value                |
 | :-------- | :------- | :------------------------- |
-| `data`    | `map[string]string` |`"name" `: "User's fullname" <br> `"email"` : "user@example.com" <br> `"title"` : "Research's title"<br> `"photo_url"` : "user.png" |
-| `error`    | `string` |"null"        |
-| `status`    | `string` |"true"        |
-
-```http
-HTTP/1.1 401 Unauthorized
-Content-Type: application/json
-```
-| Parameter | Type     | Value                |
-| :-------- | :------- | :------------------------- |
-| `"jwt"` | `string` | "[JWT]" |
-| `"message"` | `string` | "Login access permitted" |
-| `"author_id"` | `string` | "12345" |
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-```
-| Parameter | Type     | Value                |
-| :-------- | :------- | :------------------------- |
-| `data`    | `map[string]string` |` "id" `:      "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx"  <br>  `"title"` :     "Research's title"  <br>  `"author_jwt"` :  "[JWT]" <br> `"topic_id"` :  "xxxxxxxxxxxxxxxxxxxx"    |  
+| `data`    | `map[string]string` |` "id" `:      "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx"  <br>  `"title"` :     "Research's title"  <br> `"topic_id"` :  "xxxxxxxxxxxxxxxxxxxx"    |  
 | `error`    | `string` |"null"        |
 | `status`    | `string` |"true"        |
 
@@ -111,7 +61,7 @@ Content-Type: application/json
 ```
 | Parameter | Type                |Key         |                       
 | :-------- | :------------------ |:-----------|  
-| `data`    | `map[string]string` |` "id" `:     "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx"  <br>  `"title"` :     "Research's title"  <br>  `"author_jwt"` :  "[JWT]" <br> `"topic_id"` :  "xxxxxxxxxxxxxxxxxxxx"  <br> `"content"` : "paragraph1" <br> `"contributor"` : "Me" | 
+| `data`    | `map[string]string` |` "id" `:     "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx"  <br>  `"title"` :     "Research's title"  <br> `"topic_id"` :  "xxxxxxxxxxxxxxxxxxxx"  <br> `"content"` : "paragraph1" <br>  | 
 | `error`    | `string` |"null"        ||
 | `status`    | `string` |"true"        ||
 
