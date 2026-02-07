@@ -1,4 +1,7 @@
 # MinervaApi
+
+<img width="336" height="164" alt="minervapi" src="https://github.com/user-attachments/assets/1d8f699f-ab90-49ea-9fe0-eaf7c1e0cf86" />
+
 **This is a simple Go and Firebase-based RESTful API designed to manage data stored in Firebase. The API allows users to create new topics and associated research. The API is designed to be easy to use and easy to set up.**
 
 ## Installation
